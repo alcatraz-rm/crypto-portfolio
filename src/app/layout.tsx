@@ -3,7 +3,7 @@
 import { wagmiConfig } from '@/lib/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Link from 'next/link';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import { WagmiProvider } from 'wagmi';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -14,8 +14,9 @@ const queryClient = new QueryClient();
 export function Navbar() {
   const [hasMounted, setHasMounted] = useState(false);
 
-  const { isLoggedIn, isLoading } = useAuth();
-  console.log('Navbar isLoggedIn:', isLoggedIn);
+  const router = useRouter();
+
+  const { isLoggedIn, setIsLoggedIn, isLoading } = useAuth();
 
   useEffect(() => {
     setHasMounted(true);
@@ -27,6 +28,7 @@ export function Navbar() {
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
+    setIsLoggedIn(false);
     router.push('/login');
   };
 

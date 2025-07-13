@@ -1,16 +1,17 @@
 'use client';
 
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAccount, useConnect, useSignMessage } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
+  const router = useRouter();
   const { connect, connectors } = useConnect();
   const { isConnected, address } = useAccount();
-  const { isLoggedIn, setIsLoggedIn, isLoading } = useAuth();
-  // const { disconnect } = useDisconnect();
+  const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
+  const { isLoggedIn, setIsLoggedIn, isLoading } = useAuth();
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -56,13 +57,17 @@ export default function LoginPage() {
       }
 
       setIsLoggedIn(true);
-
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDisconnect = () => {
+    disconnect();
+    setIsLoggedIn(false);
   };
 
   return (
@@ -87,7 +92,7 @@ export default function LoginPage() {
         <li className="mt-2">
           Sign the login message
           {isLoggedIn ? (
-            <span className="ml-2 text-green-500"></span>
+            <span className="ml-2 text-green-500">(: Done)</span>
           ) : (
             <button
               onClick={handleLogin}
@@ -100,8 +105,18 @@ export default function LoginPage() {
         </li>
       </ol>
 
-      {isLoggedIn && <p className="text-green-500">✅ Logged in as {address}</p>}
+      <div className="flex gap-4">
+        {isConnected && (
+          <button
+            onClick={handleDisconnect}
+            className="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+          >
+            Disconnect Wallet
+          </button>
+        )}
+      </div>
 
+      {isLoggedIn && <p className="text-green-500 mt-4">✅ Logged in as {address}</p>}
       {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
   );
