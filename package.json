@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prettier": "npx prettier . --write",
+    "migrate:gen": "npx prisma migrate dev --create-only",
+    "migrate:up": "npx prisma migrate deploy",
+    "migrate:reset": "npx prisma migrate reset"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
