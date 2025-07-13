@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useAccount, useConnect, useSignMessage } from 'wagmi';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useAccount, useConnect, useSignMessage } from 'wagmi';
 
 export function useLogin() {
   const router = useRouter();

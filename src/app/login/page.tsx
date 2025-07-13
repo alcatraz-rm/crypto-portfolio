@@ -6,15 +6,8 @@ import { SignMessage } from '@/components/Login/SignMessage';
 import { useLogin } from '@/hooks/useLogin';
 
 export default function LoginPage() {
-  const {
-    address,
-    isConnected,
-    error,
-    isLoading,
-    isLoggedIn,
-    handleConnect,
-    handleLogin,
-  } = useLogin();
+  const { address, isConnected, error, isLoading, isLoggedIn, handleConnect, handleLogin } =
+    useLogin();
 
   return (
     <div className="flex flex-col items-center justify-center h-screen p-6">
