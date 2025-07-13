@@ -6,15 +6,28 @@ import { SignMessage } from '@/components/Login/SignMessage';
 import { useLogin } from '@/hooks/useLogin';
 
 export default function LoginPage() {
-  const { address, isConnected, error, isLoading, isLoggedIn, handleConnect, handleLogin } =
-    useLogin();
+  const {
+    address,
+    isConnected,
+    error,
+    isLoading,
+    isLoggedIn,
+    handleConnect,
+    handleDisconnect,
+    handleLogin,
+  } = useLogin();
 
   return (
     <div className="flex flex-col items-center justify-center h-screen p-6">
       <h1 className="text-2xl font-bold mb-6">Sign In</h1>
       <ol className="text-left text-sm mb-6 list-decimal list-inside">
         <li>
-          <ConnectWallet isConnected={isConnected} address={address} onConnect={handleConnect} />
+          <ConnectWallet
+            isConnected={isConnected}
+            address={address}
+            onConnect={handleConnect}
+            onDisconnect={handleDisconnect}
+          />
         </li>
         <li className="mt-2">
           <SignMessage isLoggedIn={isLoggedIn} onSign={handleLogin} isLoading={isLoading} />

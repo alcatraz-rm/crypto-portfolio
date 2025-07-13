@@ -1,12 +1,13 @@
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useAccount, useConnect, useSignMessage } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
 
 export function useLogin() {
   const router = useRouter();
   const { connect, connectors } = useConnect();
   const { isConnected, address } = useAccount();
+  const { disconnect } = useDisconnect();
   const { isLoggedIn, setIsLoggedIn, isLoading } = useAuth();
   const { signMessageAsync } = useSignMessage();
 
@@ -46,6 +47,10 @@ export function useLogin() {
     }
   };
 
+  const handleDisconnect = () => {
+    disconnect();
+  };
+
   return {
     address,
     isConnected,
@@ -53,6 +58,7 @@ export function useLogin() {
     isLoading: loading || isLoading,
     isLoggedIn,
     handleConnect,
+    handleDisconnect,
     handleLogin,
   };
 }
