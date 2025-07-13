@@ -1,30 +1,33 @@
-"use client";
+'use client';
 
-import { wagmiConfig } from "@/lib/wagmi";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Link from "next/link";
-import { ReactNode, useEffect, useState } from "react";
-import { WagmiProvider } from "wagmi";
-import "./globals.css";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { wagmiConfig } from '@/lib/wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Link from 'next/link';
+import router from 'next/router';
+import { ReactNode, useEffect, useState } from 'react';
+import { WagmiProvider } from 'wagmi';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import './globals.css';
 
 const queryClient = new QueryClient();
 
 export function Navbar() {
   const [hasMounted, setHasMounted] = useState(false);
 
-  const { isLoggedIn, setIsLoggedIn } = useAuth();
-  console.log("Navbar isLoggedIn:", isLoggedIn);
+  const { isLoggedIn, isLoading } = useAuth();
+  console.log('Navbar isLoggedIn:', isLoggedIn);
 
-    useEffect(() => {
+  useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  if (!hasMounted) return null;
+  if (!hasMounted || isLoading) {
+    return null;
+  }
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/login";
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
   };
 
   return (

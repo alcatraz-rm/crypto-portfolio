@@ -1,29 +1,28 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
-import { useAuth } from "./context/AuthContext";
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
+import { useAuth } from './context/AuthContext';
 
 export default function Home() {
   const [hasMounted, setHasMounted] = useState(false);
 
   const { address } = useAccount();
 
-  const { isLoggedIn, setIsLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
 
-    useEffect(() => {
+  useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  if (!hasMounted) return null;
+  if (!hasMounted || isLoading) {
+    return null;
+  }
 
   return (
     <main className="flex flex-col items-center justify-center h-screen px-4 text-center">
-      <h1 className="text-3xl font-bold mb-4">
-        Multi-Chain Crypto Portfolio Tracker
-      </h1>
+      <h1 className="text-3xl font-bold mb-4">Multi-Chain Crypto Portfolio Tracker</h1>
 
       {isLoggedIn ? (
         <>
@@ -37,9 +36,7 @@ export default function Home() {
         </>
       ) : (
         <>
-          <p className="mb-4">
-            Connect your wallet to start tracking your portfolio.
-          </p>
+          <p className="mb-4">Connect your wallet to start tracking your portfolio.</p>
           <Link
             href="/login"
             className="inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"

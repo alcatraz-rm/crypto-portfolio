@@ -1,19 +1,27 @@
-"use client";
+'use client';
 
-import { useAccount } from "wagmi";
-import Link from "next/link";
-import { useAuth } from "../context/AuthContext";
-import { useEffect, useState } from "react";
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
+import { useAuth } from '../context/AuthContext';
 
 export default function DashboardPage() {
   const [hasMounted, setHasMounted] = useState(false);
 
   const { address, isConnected } = useAccount();
-  const { isLoggedIn, setIsLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
 
-    useEffect(() => {
+  useEffect(() => {
     setHasMounted(true);
   }, []);
+
+  if (!hasMounted || isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-gray-500">Checking authentication...</p>
+      </div>
+    );
+  }
 
   if (!hasMounted) return null;
 
@@ -28,16 +36,11 @@ export default function DashboardPage() {
   if (!isLoggedIn) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center text-center p-8">
-        <h1 className="text-2xl font-semibold mb-4 text-red-600">
-          Access Denied
-        </h1>
+        <h1 className="text-2xl font-semibold mb-4 text-red-600">Access Denied</h1>
         <p className="text-gray-700 dark:text-gray-300 mb-4 max-w-md">
           You need to log in and sign a message to access your dashboard.
         </p>
-        <Link
-          href="/login"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
+        <Link href="/login" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
           Go to Login
         </Link>
       </main>
