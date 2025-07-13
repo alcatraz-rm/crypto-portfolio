@@ -20,17 +20,17 @@ export async function POST(req: NextRequest) {
     return new NextResponse('Invalid signature', { status: 401 });
   }
 
-  const token = jwt.sign({ address }, process.env.JWT_SECRET!, {
-    expiresIn: '7d',
-  });
-
-  await prisma.user.upsert({
+  const user = await prisma.user.upsert({
     where: { wallet: address },
     update: { lastLogin: new Date() },
     create: {
       wallet: address,
       lastLogin: new Date(),
     },
+  });
+
+  const token = jwt.sign({ address, userId: user.id }, process.env.JWT_SECRET!, {
+    expiresIn: '7d',
   });
 
   const response = NextResponse.json({ success: true });

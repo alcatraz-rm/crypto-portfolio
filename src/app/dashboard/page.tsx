@@ -5,11 +5,15 @@ import { AuthGate } from '@/components/Dashboard/AuthGate';
 import { RecentTransactions } from '@/components/Dashboard/RecentTransactions';
 import { SummaryCards } from '@/components/Dashboard/SummaryCards';
 
-function handleSelect(type: 'EVM' | 'TRON' | 'SOLANA', address: string) {
+async function handleSelect(type: 'EVM' | 'TRON' | 'SOLANA', address: string) {
   console.log('Selected wallet type:', type);
   console.log('Entered wallet address:', address);
 
-  // TODO: Save to backend or state
+  const verifyRes = await fetch('/api/auth/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ address }),
+  });
 }
 
 export default function DashboardPage() {

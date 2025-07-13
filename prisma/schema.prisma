@@ -14,5 +14,27 @@ model User {
   wallet    String   @unique
   lastLogin DateTime @default(now()) @map("last_login")
 
+  wallets   Wallet[]
+
   @@map("users")
 }
+
+model Wallet {
+  id         Int       @id @default(autoincrement())
+  address    String    @unique
+  type       WalletType
+  createdAt  DateTime  @default(now()) @map("created_at")
+  deletedAt  DateTime?                 @map("deleted_at")
+
+  userId     Int                       @map("user_id")
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@map("wallets")
+}
+
+enum WalletType {
+  EVM
+  TRON
+  SOLANA
+}
+
