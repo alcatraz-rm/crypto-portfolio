@@ -22,3 +22,16 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+node_modules
+target
+dist
+logs
+public
+.cache
+.vscode
+.DS_Store
+.idea
+.next
+yarn-error.log
+npm-debug.log
