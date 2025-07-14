@@ -1,7 +1,7 @@
-// src/components/Navbar.tsx
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
+import { useAccount } from 'wagmi';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AppBar, Box, Button, IconButton, Toolbar, Typography } from '@mui/material';
@@ -18,6 +18,7 @@ interface NavbarProps {
 export default function Navbar({ mode, toggleTheme }: NavbarProps) {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn, isLoading } = useAuth();
+  const { address, isConnected } = useAccount();
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
@@ -53,6 +54,15 @@ export default function Navbar({ mode, toggleTheme }: NavbarProps) {
           <Button component={Link} href="/dashboard" color="inherit">
             Dashboard
           </Button>
+
+          {isLoggedIn && isConnected && address && (
+            <Typography
+              variant="body2"
+              sx={{ fontFamily: 'monospace', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              {address}
+            </Typography>
+          )}
 
           {isLoggedIn ? (
             <IconButton color="error" onClick={handleLogout} title="Logout">
