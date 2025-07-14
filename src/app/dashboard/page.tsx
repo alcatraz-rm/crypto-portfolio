@@ -9,11 +9,16 @@ async function handleSelect(type: 'EVM' | 'TRON' | 'SOLANA', address: string) {
   console.log('Selected wallet type:', type);
   console.log('Entered wallet address:', address);
 
-  const verifyRes = await fetch('/api/auth/verify', {
+  const res = await fetch('/api/portfolio/addWallet', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ address }),
   });
+  const success = await res.json();
+
+  if (!success) {
+    // handle
+  }
 }
 
 export default function DashboardPage() {

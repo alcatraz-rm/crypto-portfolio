@@ -1,3 +1,4 @@
+import { UserJwt } from '@/lib/auth';
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
     return NextResponse.json({
       authenticated: true,
-      address: (decoded as any).address,
+      address: (decoded as UserJwt).address,
     });
   } catch {
     return NextResponse.json({ authenticated: false }, { status: 401 });

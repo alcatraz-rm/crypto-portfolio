@@ -16,7 +16,7 @@ export function getAuthenticatedUser(req: NextRequest): UserJwt | null {
   try {
     const decoded = verify(token, JWT_SECRET) as UserJwt;
     return decoded;
-  } catch (e) {
+  } catch {
     return null;
   }
 }
