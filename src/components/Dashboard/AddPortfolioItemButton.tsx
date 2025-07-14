@@ -1,8 +1,8 @@
-// src/components/Dashboard/AddPortfolioItemButton.tsx
 'use client';
 
 import { SupportedEvmChains, supportedEvmChainsArray } from '@/app/api/constants';
 import { isValidAddress } from '@/utils/validateAddress';
+import { Paper } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -11,7 +11,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
@@ -24,6 +23,24 @@ import { useState } from 'react';
 interface Props {
   onSelect: (chain: 'EVM' | 'TRON' | 'SOLANA', address: string, chains?: string[]) => void;
 }
+
+const chainDisplayNames: Record<SupportedEvmChains, string> = {
+  'eth-mainnet': 'Ethereum Mainnet',
+  'zksync-mainnet': 'zkSync Mainnet',
+  'opt-mainnet': 'Optimism Mainnet',
+  'polygon-mainnet': 'Polygon Mainnet',
+  'arb-mainnet': 'Arbitrum One',
+  'arbnova-mainnet': 'Arbitrum Nova',
+  'blast-mainnet': 'Blast Mainnet',
+  'linea-mainnet': 'Linea Mainnet',
+  'berachain-mainnet': 'Berachain Mainnet',
+  'base-mainnet': 'Base Mainnet',
+  'avax-mainnet': 'Avalanche Mainnet',
+  'bnb-mainnet': 'Binance Smart Chain',
+  'gnosis-mainnet': 'Gnosis Chain',
+  'sonic-mainnet': 'Sonic Mainnet',
+  'scroll-mainnet': 'Scroll Mainnet',
+};
 
 export function AddPortfolioItemButton({ onSelect }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -173,31 +190,60 @@ export function AddPortfolioItemButton({ onSelect }: Props) {
               <CircularProgress />
             </Box>
           ) : (
-            [...supportedEvmChainsArray]
-              .sort((a, b) => (balances[b] ?? 0) - (balances[a] ?? 0))
-              .map((chain) => (
-                <FormControlLabel
-                  key={chain}
-                  control={
-                    <Checkbox
-                      checked={selectedChains.includes(chain)}
-                      onChange={() => toggleChain(chain)}
-                    />
-                  }
-                  label={
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Image src={`/icons/${chain}.svg`} alt={chain} width={20} height={20} />
-                      <Typography>{chain.replace('-', ' ')}</Typography>
-                      <Typography sx={{ ml: 2, color: 'text.secondary' }}>
-                        ${balances[chain]?.toFixed(2) ?? '0.00'}
-                      </Typography>
-                    </Box>
-                  }
-                  sx={{ display: 'block', mb: 1 }}
-                />
-              ))
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                gap: 2,
+                py: 2,
+              }}
+            >
+              {[...supportedEvmChainsArray]
+                .sort((a, b) => (balances[b] ?? 0) - (balances[a] ?? 0))
+                .map((chain) => {
+                  const isSelected = selectedChains.includes(chain);
+                  return (
+                    <Paper
+                      key={chain}
+                      elevation={isSelected ? 6 : 2}
+                      sx={{
+                        p: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        cursor: 'pointer',
+                        border: isSelected ? '2px solid' : '2px solid transparent',
+                        borderColor: isSelected ? 'primary.main' : 'transparent',
+                        '&:hover': { boxShadow: 6 },
+                      }}
+                      onClick={() => toggleChain(chain)}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Image src={`/icons/${chain}.svg`} alt={chain} width={24} height={24} />
+                        <Typography variant="subtitle1">{chainDisplayNames[chain]}</Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          ${balances[chain]?.toFixed(2) ?? '0.00'}
+                        </Typography>
+                        <Checkbox
+                          checked={isSelected}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleChain(chain);
+                          }}
+                        />
+                      </Box>
+                    </Paper>
+                  );
+                })}
+            </Box>
           )}
-          {chainError && <Typography color="error">{chainError}</Typography>}
+          {chainError && (
+            <Typography color="error" sx={{ mt: 1 }}>
+              {chainError}
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={closeChainDialog}>Cancel</Button>

@@ -34,7 +34,6 @@ export async function fetchBalanceByChains(
   }
 
   const tokensResp: TokensByAddressApiResponse = JSON.parse(text);
-  console.log(JSON.stringify(tokensResp));
   const balanceByChains = calculateBalanceByChain(tokensResp);
 
   return balanceByChains;

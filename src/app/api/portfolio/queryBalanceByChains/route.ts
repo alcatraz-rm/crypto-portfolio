@@ -23,7 +23,6 @@ export async function GET(req: NextRequest) {
 
   try {
     const balanceByChains = await fetchBalanceByChains(address, supportedEvmChainsArray);
-    console.log(balanceByChains);
     return NextResponse.json(balanceByChains, { status: 200 });
   } catch (err) {
     return NextResponse.json({ ok: false, message: 'internal server error' });
