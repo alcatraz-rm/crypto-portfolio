@@ -39,4 +39,4 @@ jobs:
         run: npx prettier -c .
 
       - name: Build
-        run: npx prisma generate && next build
+        run: npx prisma generate && npx next build
