@@ -1,72 +1,121 @@
+// src/components/Dashboard/AddPortfolioItemButton.tsx
 'use client';
 
+import { SupportedEvmChains, supportedEvmChainsArray } from '@/app/api/constants';
 import { isValidAddress } from '@/utils/validateAddress';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 import { useState } from 'react';
 
-export function AddPortfolioItemButton({
-  onSelect,
-}: {
-  onSelect: (type: 'EVM' | 'TRON' | 'SOLANA', address: string) => void;
-}) {
+interface Props {
+  onSelect: (chain: 'EVM' | 'TRON' | 'SOLANA', address: string, chains?: string[]) => void;
+}
+
+export function AddPortfolioItemButton({ onSelect }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Wallet-entry dialog state
+  const [walletDialogOpen, setWalletDialogOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<'EVM' | 'TRON' | 'SOLANA' | null>(null);
   const [walletAddress, setWalletAddress] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [walletError, setWalletError] = useState<string | null>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  // Chain-selection dialog state (only for EVM)
+  const [chainDialogOpen, setChainDialogOpen] = useState(false);
+  const [balances, setBalances] = useState<Record<string, number> | null>(null);
+  const [chainError, setChainError] = useState<string | null>(null);
+  const [selectedChains, setSelectedChains] = useState<SupportedEvmChains[]>([]);
 
+  // Open/close menu
+  const openMenu = (e: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(e.currentTarget);
+  const closeMenu = () => setAnchorEl(null);
+
+  // Menu selection
   const onTypeSelect = (type: 'EVM' | 'TRON' | 'SOLANA') => {
     setSelectedType(type);
-    setDialogOpen(true);
     setWalletAddress('');
-    setError(null);
-    handleMenuClose();
+    setWalletError(null);
+    setChainError(null);
+    setSelectedChains([]);
+    closeMenu();
+    setWalletDialogOpen(true);
   };
 
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    setSelectedType(null);
-    setWalletAddress('');
-    setError(null);
+  const closeWalletDialog = () => {
+    setWalletDialogOpen(false);
   };
 
-  const handleConfirm = () => {
+  const confirmWallet = async () => {
     const addr = walletAddress.trim();
     if (!addr) {
-      setError('Wallet address is required');
+      setWalletError('Wallet address is required');
       return;
     }
     if (!isValidAddress(addr, selectedType!)) {
-      setError(`Invalid ${selectedType} address`);
+      setWalletError('Invalid address');
       return;
     }
-    onSelect(selectedType!, addr);
-    handleDialogClose();
+    // If EVM: fetch balances and open chain dialog
+    if (selectedType && selectedType !== 'TRON' && selectedType !== 'SOLANA') {
+      try {
+        const res = await fetch(`/api/portfolio/queryBalanceByChains?address=${addr}`);
+        if (!res.ok) throw new Error(await res.text());
+        const json: Record<string, number> = await res.json();
+        console.log(JSON.stringify(json));
+        setBalances(json);
+        setWalletDialogOpen(false);
+        setChainDialogOpen(true);
+      } catch (err: any) {
+        setWalletError(err.message || 'Failed to fetch balances');
+      }
+    } else {
+      // TRON or SOLANA: directly call onSelect
+      onSelect(selectedType!, addr);
+      setWalletDialogOpen(false);
+    }
+  };
+
+  const closeChainDialog = () => {
+    setChainDialogOpen(false);
+    setBalances(null);
+  };
+
+  const toggleChain = (chain: SupportedEvmChains) => {
+    setSelectedChains((prev) =>
+      prev.includes(chain) ? prev.filter((c) => c !== chain) : [...prev, chain],
+    );
+    setChainError(null);
+  };
+
+  const confirmChains = () => {
+    if (selectedChains.length === 0) {
+      setChainError('Select at least one network');
+      return;
+    }
+    onSelect('EVM', walletAddress.trim(), selectedChains);
+    closeChainDialog();
   };
 
   return (
     <>
-      <Button variant="contained" onClick={handleMenuOpen}>
+      <Button variant="contained" onClick={openMenu}>
         Add Portfolio Item
       </Button>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={closeMenu}>
         <MenuItem onClick={() => onTypeSelect('EVM')}>
           <ListItemIcon>
             <Image src="/icons/evm.svg" alt="EVM" width={20} height={20} />
@@ -87,8 +136,9 @@ export function AddPortfolioItemButton({
         </MenuItem>
       </Menu>
 
-      <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Add {selectedType} Wallet</DialogTitle>
+      {/* Wallet Address Dialog */}
+      <Dialog open={walletDialogOpen} onClose={closeWalletDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Enter Wallet Address</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -100,15 +150,58 @@ export function AddPortfolioItemButton({
             value={walletAddress}
             onChange={(e) => {
               setWalletAddress(e.target.value);
-              if (error) setError(null);
+              setWalletError(null);
             }}
-            error={Boolean(error)}
-            helperText={error}
+            error={Boolean(walletError)}
+            helperText={walletError}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button onClick={handleConfirm} variant="contained">
+          <Button onClick={closeWalletDialog}>Cancel</Button>
+          <Button variant="contained" onClick={confirmWallet}>
+            Next
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Chain Selection Dialog (EVM only) */}
+      <Dialog open={chainDialogOpen} onClose={closeChainDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Select Networks to Track</DialogTitle>
+        <DialogContent>
+          {balances === null ? (
+            <Box display="flex" justifyContent="center" p={4}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            [...supportedEvmChainsArray]
+              .sort((a, b) => (balances[b] ?? 0) - (balances[a] ?? 0))
+              .map((chain) => (
+                <FormControlLabel
+                  key={chain}
+                  control={
+                    <Checkbox
+                      checked={selectedChains.includes(chain)}
+                      onChange={() => toggleChain(chain)}
+                    />
+                  }
+                  label={
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Image src={`/icons/${chain}.svg`} alt={chain} width={20} height={20} />
+                      <Typography>{chain.replace('-', ' ')}</Typography>
+                      <Typography sx={{ ml: 2, color: 'text.secondary' }}>
+                        ${balances[chain]?.toFixed(2) ?? '0.00'}
+                      </Typography>
+                    </Box>
+                  }
+                  sx={{ display: 'block', mb: 1 }}
+                />
+              ))
+          )}
+          {chainError && <Typography color="error">{chainError}</Typography>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeChainDialog}>Cancel</Button>
+          <Button variant="contained" onClick={confirmChains}>
             Confirm
           </Button>
         </DialogActions>

@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-async function handleSelect(type: 'EVM' | 'TRON' | 'SOLANA', address: string) {
+async function handleSelect(type: 'EVM' | 'TRON' | 'SOLANA', address: string, chains?: string[]) {
   console.log('Selected wallet type:', type);
   console.log('Entered wallet address:', address);
 
@@ -19,6 +19,12 @@ async function handleSelect(type: 'EVM' | 'TRON' | 'SOLANA', address: string) {
   const json = await res.json();
   if (!json.success) {
     // handle error
+  }
+
+  if (type === 'EVM') {
+    // save chains to db
+  } else if (type === 'TRON') {
+  } else if (type === 'SOLANA') {
   }
 }
 
