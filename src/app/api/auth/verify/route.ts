@@ -1,7 +1,10 @@
 import prisma from '@/lib/prisma';
+import { get } from 'env-var';
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyMessage } from 'viem';
+
+const JWT_SECRET = get('JWT_SECRET').required().asString();
 
 export async function POST(req: NextRequest) {
   const { address, signature, nonce } = await req.json();
@@ -29,7 +32,7 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const token = jwt.sign({ address, userId: user.id }, process.env.JWT_SECRET!, {
+  const token = jwt.sign({ address, userId: user.id }, JWT_SECRET, {
     expiresIn: '7d',
   });
 

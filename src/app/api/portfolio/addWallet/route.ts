@@ -1,15 +1,12 @@
-import { Prisma, WalletType } from '@/generated/prisma';
+import { Prisma } from '@/generated/prisma';
 import { getAuthenticatedUser } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { isValidAddress } from '@/utils/validateAddress';
 import { NextRequest, NextResponse } from 'next/server';
-
-const WALLET_TYPES: WalletType[] = ['EVM', 'SOLANA', 'TRON'];
+import { WALLET_TYPES } from '../../constants';
 
 export async function POST(req: NextRequest) {
   const user = getAuthenticatedUser(req);
-
-  console.log(JSON.stringify(user));
 
   if (!user) {
     return new NextResponse('Unauthorized', { status: 401 });
