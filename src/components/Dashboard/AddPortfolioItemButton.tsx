@@ -2,7 +2,23 @@
 
 import { SupportedEvmChains, supportedEvmChainsArray } from '@/app/api/constants';
 import { isValidAddress } from '@/utils/validateAddress';
-import { Paper, Box, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, ListItemIcon, ListItemText, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Paper,
+  TextField,
+  Typography,
+} from '@mui/material';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -64,12 +80,26 @@ export function AddPortfolioItemButton({ onSelect }: Props) {
       setChainDialogOpen(true);
       setIsFetching(true);
       try {
-        const res = await fetch(`/api/portfolio/queryBalanceByChains?address=${addr}`);
+        const res = await fetch(`/api/portfolio/queryBalanceByChainsEvm?address=${addr}`);
         if (!res.ok) throw new Error(await res.text());
         const json: Record<string, number> = await res.json();
         setBalances(json);
       } catch (err: any) {
         setChainError(err.message || 'Failed to fetch balances');
+      } finally {
+        setIsFetching(false);
+      }
+    } else if (selectedType === 'SOLANA') {
+      setWalletDialogOpen(false);
+      setChainDialogOpen(true);
+      setIsFetching(true);
+      try {
+        const res = await fetch(`/api/portfolio/queryBalanceSolana?address=${addr}`);
+        if (!res.ok) throw new Error(await res.text());
+        // const json: Record<string, number> = await res.json();
+        // setBalances(json);
+      } catch (err: any) {
+        setChainError(err.message || 'Failed to fetch solana balance');
       } finally {
         setIsFetching(false);
       }
@@ -86,7 +116,9 @@ export function AddPortfolioItemButton({ onSelect }: Props) {
   };
 
   const toggleChain = (chain: SupportedEvmChains) => {
-    setSelectedChains(prev => prev.includes(chain) ? prev.filter(c => c !== chain) : [...prev, chain]);
+    setSelectedChains((prev) =>
+      prev.includes(chain) ? prev.filter((c) => c !== chain) : [...prev, chain],
+    );
     setChainError(null);
   };
 
@@ -98,7 +130,9 @@ export function AddPortfolioItemButton({ onSelect }: Props) {
 
   return (
     <>
-      <Button variant="contained" onClick={openMenu}>Add Portfolio Item</Button>
+      <Button variant="contained" onClick={openMenu}>
+        Add Portfolio Item
+      </Button>
 
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={closeMenu}>
         <MenuItem onClick={() => onTypeSelect('EVM')}>
@@ -125,33 +159,61 @@ export function AddPortfolioItemButton({ onSelect }: Props) {
         <DialogTitle>Enter Wallet Address</DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus fullWidth margin="dense" label="Wallet Address" variant="outlined"
+            autoFocus
+            fullWidth
+            margin="dense"
+            label="Wallet Address"
+            variant="outlined"
             value={walletAddress}
-            onChange={e => { setWalletAddress(e.target.value); setWalletError(null); }}
+            onChange={(e) => {
+              setWalletAddress(e.target.value);
+              setWalletError(null);
+            }}
             error={!!walletError}
             helperText={walletError}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={closeWalletDialog}>Cancel</Button>
-          <Button variant="contained" onClick={confirmWallet}>Next</Button>
+          <Button variant="contained" onClick={confirmWallet}>
+            Next
+          </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={chainDialogOpen} onClose={closeChainDialog} fullWidth maxWidth="sm">
         <DialogTitle>Select Networks to Track</DialogTitle>
         <DialogContent>
-          {(isFetching || balances === null) ? (
-            <Box display="flex" justifyContent="center" p={4}><CircularProgress /></Box>
+          {isFetching || balances === null ? (
+            <Box display="flex" justifyContent="center" p={4}>
+              <CircularProgress />
+            </Box>
           ) : (
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, py: 2 }}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                gap: 2,
+                py: 2,
+              }}
+            >
               {[...supportedEvmChainsArray]
                 .sort((a, b) => (balances[b] ?? 0) - (balances[a] ?? 0))
-                .map(chain => {
+                .map((chain) => {
                   const isSelected = selectedChains.includes(chain);
                   return (
-                    <Paper key={chain} elevation={isSelected ? 6 : 2}
-                      sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', border: isSelected ? '2px solid primary.main' : '2px solid transparent', '&:hover': { boxShadow: 6 } }}
+                    <Paper
+                      key={chain}
+                      elevation={isSelected ? 6 : 2}
+                      sx={{
+                        p: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        cursor: 'pointer',
+                        border: isSelected ? '2px solid primary.main' : '2px solid transparent',
+                        '&:hover': { boxShadow: 6 },
+                      }}
                       onClick={() => toggleChain(chain)}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -159,19 +221,33 @@ export function AddPortfolioItemButton({ onSelect }: Props) {
                         <Typography variant="subtitle1">{chainDisplayNames[chain]}</Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2" color="text.secondary">${balances[chain]?.toFixed(2) ?? '0.00'}</Typography>
-                        <Checkbox checked={isSelected} onClick={e => { e.stopPropagation(); toggleChain(chain); }} />
+                        <Typography variant="body2" color="text.secondary">
+                          ${balances[chain]?.toFixed(2) ?? '0.00'}
+                        </Typography>
+                        <Checkbox
+                          checked={isSelected}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleChain(chain);
+                          }}
+                        />
                       </Box>
                     </Paper>
                   );
                 })}
             </Box>
           )}
-          {chainError && <Typography color="error" sx={{ mt: 1 }}>{chainError}</Typography>}
+          {chainError && (
+            <Typography color="error" sx={{ mt: 1 }}>
+              {chainError}
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={closeChainDialog}>Cancel</Button>
-          <Button variant="contained" onClick={confirmChains}>Confirm</Button>
+          <Button variant="contained" onClick={confirmChains}>
+            Confirm
+          </Button>
         </DialogActions>
       </Dialog>
     </>

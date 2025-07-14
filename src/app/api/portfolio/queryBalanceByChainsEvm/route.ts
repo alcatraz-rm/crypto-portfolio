@@ -1,5 +1,5 @@
 import { getAuthenticatedUser } from '@/lib/auth';
-import { fetchBalanceByChains } from '@/utils/getBalance';
+import { fetchBalanceByChainsEvm } from '@/utils/balance/getBalanceEvm';
 import { isValidAddress } from '@/utils/validateAddress';
 import { NextRequest, NextResponse } from 'next/server';
 import { supportedEvmChainsArray } from '../../constants';
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const address = req.nextUrl.searchParams.get('address');
 
   if (!address) {
-    return new NextResponse('Address is reequired', { status: 400 });
+    return new NextResponse('Address is required', { status: 400 });
   }
 
   if (!isValidAddress(address, 'EVM')) {
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const balanceByChains = await fetchBalanceByChains(address, supportedEvmChainsArray);
+    const balanceByChains = await fetchBalanceByChainsEvm(address, supportedEvmChainsArray);
     return NextResponse.json(balanceByChains, { status: 200 });
   } catch (err) {
     return NextResponse.json({ ok: false, message: 'internal server error' });

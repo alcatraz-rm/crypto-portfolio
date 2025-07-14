@@ -1,10 +1,10 @@
 import { SupportedEvmChains } from '@/app/api/constants';
 import { get } from 'env-var';
-import { TokensByAddressApiResponse } from './balance/types';
+import { TokensByAddressApiResponse } from './types';
 
 const ALCHEMY_API_KEY = get('ALCHEMY_API_KEY').required().asString();
 
-export async function fetchBalanceByChains(
+export async function fetchBalanceByChainsEvm(
   address: string,
   networks: SupportedEvmChains[],
 ): Promise<Record<string, number>> {
