@@ -1,13 +1,13 @@
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
-import { useAccount } from 'wagmi';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AppBar, Box, Button, IconButton, Toolbar, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
 import ThemeSwitcher from './ThemeSwitcher';
 
 interface NavbarProps {
@@ -58,7 +58,13 @@ export default function Navbar({ mode, toggleTheme }: NavbarProps) {
           {isLoggedIn && isConnected && address && (
             <Typography
               variant="body2"
-              sx={{ fontFamily: 'monospace', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              sx={{
+                fontFamily: 'monospace',
+                maxWidth: 200,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
             >
               {address}
             </Typography>
