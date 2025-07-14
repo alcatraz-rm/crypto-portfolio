@@ -1,12 +1,18 @@
 'use client';
 
+import { Box, Paper, Typography } from '@mui/material';
+
 export function RecentTransactions() {
   return (
-    <section>
-      <h2 className="text-xl font-semibold mb-2">Recent Transactions</h2>
-      <div className="rounded-lg bg-white dark:bg-zinc-800 p-4 shadow text-sm">
-        <p className="text-zinc-500 italic">No transactions found.</p>
-      </div>
-    </section>
+    <Box mb={4}>
+      <Typography variant="h6" gutterBottom>
+        Recent Transactions
+      </Typography>
+      <Paper elevation={2} sx={{ p: 2 }}>
+        <Typography variant="body2" color="text.secondary" fontStyle="italic">
+          No transactions found.
+        </Typography>
+      </Paper>
+    </Box>
   );
 }

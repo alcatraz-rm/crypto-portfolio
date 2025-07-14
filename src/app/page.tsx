@@ -1,5 +1,6 @@
 'use client';
 
+import { Box, Button, CircularProgress, Container, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -7,9 +8,7 @@ import { useAuth } from './context/AuthContext';
 
 export default function Home() {
   const [hasMounted, setHasMounted] = useState(false);
-
   const { address } = useAccount();
-
   const { isLoggedIn, isLoading } = useAuth();
 
   useEffect(() => {
@@ -17,34 +16,57 @@ export default function Home() {
   }, []);
 
   if (!hasMounted || isLoading) {
-    return null;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen px-4 text-center">
-      <h1 className="text-3xl font-bold mb-4">Multi-Chain Crypto Portfolio Tracker</h1>
+    <Container
+      component="main"
+      maxWidth="sm"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        textAlign: 'center',
+        px: 2,
+      }}
+    >
+      <Typography variant="h3" component="h1" gutterBottom>
+        Multi-Chain Crypto Portfolio Tracker
+      </Typography>
 
       {isLoggedIn ? (
         <>
-          <p className="mb-2">✅ Logged in: {address}</p>
-          <Link
-            href="/dashboard"
-            className="mt-4 inline-block px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            ✅ Logged in: {address}
+          </Typography>
+          <Button variant="contained" color="success" component={Link} href="/dashboard">
             Go to Dashboard
-          </Link>
+          </Button>
         </>
       ) : (
         <>
-          <p className="mb-4">Connect your wallet to start tracking your portfolio.</p>
-          <Link
-            href="/login"
-            className="inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Connect your wallet to start tracking your portfolio.
+          </Typography>
+          <Button variant="contained" color="primary" component={Link} href="/login">
             Log in with MetaMask
-          </Link>
+          </Button>
         </>
       )}
-    </main>
+    </Container>
   );
 }

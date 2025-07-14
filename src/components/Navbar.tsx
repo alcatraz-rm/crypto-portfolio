@@ -1,22 +1,21 @@
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { AppBar, Box, Button, IconButton, Toolbar, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export function Navbar() {
-  const [hasMounted, setHasMounted] = useState(false);
+export default function Navbar() {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn, isLoading } = useAuth();
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
-
-  if (!hasMounted || isLoading) {
-    return null;
-  }
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -24,24 +23,37 @@ export function Navbar() {
     router.push('/login');
   };
 
+  if (!hasMounted || isLoading) return null;
+
   return (
-    <nav className="w-full px-6 py-4 bg-zinc-100 dark:bg-zinc-800 flex justify-between items-center">
-      <Link href="/" className="text-xl font-bold">
-        CryptoTracker
-      </Link>
-      <div className="flex gap-4">
-        <Link href="/">Home</Link>
-        <Link href="/dashboard">Dashboard</Link>
-        {isLoggedIn ? (
-          <button onClick={handleLogout} className="cursor-pointer text-red-600 font-medium">
-            Logout
-          </button>
-        ) : (
-          <Link href="/login" className="text-blue-600 font-medium">
-            Login
-          </Link>
-        )}
-      </div>
-    </nav>
+    <AppBar position="static" color="default" elevation={1}>
+      <Toolbar>
+        <Typography
+          variant="h6"
+          component={Link}
+          href="/"
+          sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
+        >
+          CryptoTracker
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button component={Link} href="/" color="inherit">
+            Home
+          </Button>
+          <Button component={Link} href="/dashboard" color="inherit">
+            Dashboard
+          </Button>
+          {isLoggedIn ? (
+            <IconButton color="error" onClick={handleLogout} title="Logout">
+              <LogoutIcon />
+            </IconButton>
+          ) : (
+            <IconButton component={Link} href="/login" color="primary" title="Login">
+              <LoginIcon />
+            </IconButton>
+          )}
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }

@@ -1,21 +1,21 @@
 'use client';
 
-interface Props {
+import { Button, Typography } from '@mui/material';
+
+interface SignMessageProps {
   isLoggedIn: boolean;
   isLoading: boolean;
   onSign: () => void;
 }
 
-export function SignMessage({ isLoggedIn, isLoading, onSign }: Props) {
+export function SignMessage({ isLoggedIn, isLoading, onSign }: SignMessageProps) {
   return isLoggedIn ? (
-    <span className="ml-2 text-green-500">✅ Signed in</span>
+    <Typography variant="body2" color="success.main">
+      ✅ Signed in
+    </Typography>
   ) : (
-    <button
-      onClick={onSign}
-      disabled={isLoading}
-      className="ml-2 px-2 py-1 text-sm bg-green-600 text-white rounded"
-    >
+    <Button variant="contained" color="success" onClick={onSign} disabled={isLoading}>
       {isLoading ? 'Signing...' : 'Sign In'}
-    </button>
+    </Button>
   );
 }

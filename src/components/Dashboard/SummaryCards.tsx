@@ -1,37 +1,39 @@
 'use client';
 
+import { Box, Paper, Typography } from '@mui/material';
 import { useAccount } from 'wagmi';
 
 export function SummaryCards() {
   const { isConnected, address } = useAccount();
 
   return (
-    <>
+    <Box mb={4}>
       {isConnected ? (
-        <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
-          Welcome, <span className="font-mono">{address}</span>
-        </p>
+        <Typography variant="body2" color="text.secondary" mb={2}>
+          Welcome,{' '}
+          <Box component="span" fontFamily="monospace">
+            {address}
+          </Box>
+        </Typography>
       ) : (
-        <p className="mb-6 text-sm text-red-500">Wallet not connected</p>
+        <Typography variant="body2" color="error" mb={2}>
+          Wallet not connected
+        </Typography>
       )}
-
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-2">Portfolio Summary</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="rounded-lg bg-white dark:bg-zinc-800 p-4 shadow">
-            <h3 className="text-sm text-zinc-500">Total Value</h3>
-            <p className="text-lg font-medium">$—</p>
-          </div>
-          <div className="rounded-lg bg-white dark:bg-zinc-800 p-4 shadow">
-            <h3 className="text-sm text-zinc-500">Chains Tracked</h3>
-            <p className="text-lg font-medium">—</p>
-          </div>
-          <div className="rounded-lg bg-white dark:bg-zinc-800 p-4 shadow">
-            <h3 className="text-sm text-zinc-500">Assets Held</h3>
-            <p className="text-lg font-medium">—</p>
-          </div>
-        </div>
-      </section>
-    </>
+      <Box display="flex" flexWrap="wrap" gap={2}>
+        {[
+          { label: 'Total Value', value: '$—' },
+          { label: 'Chains Tracked', value: '—' },
+          { label: 'Assets Held', value: '—' },
+        ].map((card, idx) => (
+          <Paper key={idx} elevation={3} sx={{ p: 2, flex: '1 1 200px', textAlign: 'center' }}>
+            <Typography variant="subtitle2" color="text.secondary">
+              {card.label}
+            </Typography>
+            <Typography variant="h6">{card.value}</Typography>
+          </Paper>
+        ))}
+      </Box>
+    </Box>
   );
 }

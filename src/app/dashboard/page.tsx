@@ -2,8 +2,10 @@
 
 import { AddPortfolioItemButton } from '@/components/Dashboard/AddPortfolioItemButton';
 import { AuthGate } from '@/components/Dashboard/AuthGate';
-import { RecentTransactions } from '@/components/Dashboard/RecentTransactions';
-import { SummaryCards } from '@/components/Dashboard/SummaryCards';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 async function handleSelect(type: 'EVM' | 'TRON' | 'SOLANA', address: string) {
   console.log('Selected wallet type:', type);
@@ -12,26 +14,69 @@ async function handleSelect(type: 'EVM' | 'TRON' | 'SOLANA', address: string) {
   const res = await fetch('/api/portfolio/addWallet', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ address }),
+    body: JSON.stringify({ type, address }),
   });
-  const success = await res.json();
-
-  if (!success) {
-    // handle
+  const json = await res.json();
+  if (!json.success) {
+    // handle error
   }
 }
 
 export default function DashboardPage() {
   return (
     <AuthGate>
-      <main className="min-h-screen p-6 md:p-10 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+      <Box
+        component="main"
+        minHeight="100vh"
+        bgcolor="background.default"
+        color="text.primary"
+        px={{ xs: 2, md: 4 }}
+        py={{ xs: 3, md: 5 }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+          <Typography variant="h4" component="h1">
+            Dashboard
+          </Typography>
           <AddPortfolioItemButton onSelect={handleSelect} />
-        </div>
-        <SummaryCards />
-        <RecentTransactions />
-      </main>
+        </Box>
+
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4} mb={4} sx={{ flexWrap: 'wrap' }}>
+          {[
+            { label: 'Total Value', value: '$—' },
+            { label: 'Chains Tracked', value: '—' },
+            { label: 'Assets Held', value: '—' },
+          ].map((card, idx) => (
+            <Paper
+              key={idx}
+              elevation={3}
+              sx={{
+                flex: '1 1 0',
+                minWidth: 240,
+                p: 2,
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {card.label}
+              </Typography>
+              <Typography variant="h6" mt={1}>
+                {card.value}
+              </Typography>
+            </Paper>
+          ))}
+        </Stack>
+
+        <Box>
+          <Typography variant="h6" component="h2" gutterBottom>
+            Recent Transactions
+          </Typography>
+          <Paper elevation={2} sx={{ p: 2 }}>
+            <Typography variant="body2" color="text.secondary" fontStyle="italic">
+              No transactions found.
+            </Typography>
+          </Paper>
+        </Box>
+      </Box>
     </AuthGate>
   );
 }

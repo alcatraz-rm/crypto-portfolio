@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
 
@@ -18,23 +19,32 @@ export function AuthGate({ children }: Props) {
 
   if (!hasMounted || isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-gray-500">Checking authentication...</p>
-      </div>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (!isLoggedIn) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center text-center p-8">
-        <h1 className="text-2xl font-semibold mb-4 text-red-600">Access Denied</h1>
-        <p className="text-gray-700 dark:text-gray-300 mb-4 max-w-md">
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        textAlign="center"
+        minHeight="100vh"
+        p={3}
+      >
+        <Typography variant="h5" color="error" gutterBottom>
+          Access Denied
+        </Typography>
+        <Typography variant="body1" gutterBottom>
           You need to log in and sign a message to access your dashboard.
-        </p>
-        <Link href="/login" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        </Typography>
+        <Button variant="contained" component={Link} href="/login">
           Go to Login
-        </Link>
-      </main>
+        </Button>
+      </Box>
     );
   }
 

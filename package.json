@@ -14,6 +14,10 @@
     "migrate:reset": "npx prisma migrate reset"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.2.0",
+    "@mui/material": "^7.2.0",
     "@prisma/client": "^6.11.1",
     "@solana/web3.js": "^1.98.2",
     "@tanstack/react-query": "^5.83.0",

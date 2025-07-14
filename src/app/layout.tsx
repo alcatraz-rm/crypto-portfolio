@@ -1,27 +1,36 @@
 'use client';
 
-import { Navbar } from '@/components/Navbar';
+import Navbar from '@/components/Navbar';
 import { wagmiConfig } from '@/lib/wagmi';
+import { Box, Container, CssBaseline } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode } from 'react';
 import { WagmiProvider } from 'wagmi';
 import { AuthProvider } from './context/AuthContext';
 import './globals.css';
 
 const queryClient = new QueryClient();
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
+              <CssBaseline />
               <Navbar />
-              {children}
-              <footer className="w-full px-6 py-4 bg-zinc-100 dark:bg-zinc-800 text-center text-sm text-gray-600 dark:text-gray-400">
+              <Container maxWidth="lg">
+                <Box my={4}>{children}</Box>
+              </Container>
+              <Box
+                component="footer"
+                py={3}
+                textAlign="center"
+                bgcolor="background.default"
+                color="text.secondary"
+              >
                 &copy; {new Date().getFullYear()} CryptoTracker
-              </footer>
+              </Box>
             </AuthProvider>
           </QueryClientProvider>
         </WagmiProvider>

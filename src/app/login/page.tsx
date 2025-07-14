@@ -1,9 +1,10 @@
 'use client';
 
 import { ConnectWallet } from '@/components/Login/ConnectWallet';
-import { LoginStatus } from '@/components/Login/LoginStatus';
 import { SignMessage } from '@/components/Login/SignMessage';
 import { useLogin } from '@/hooks/useLogin';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import { Box, CircularProgress, Container, Typography } from '@mui/material';
 
 export default function LoginPage() {
   const {
@@ -13,28 +14,52 @@ export default function LoginPage() {
     isLoading,
     isLoggedIn,
     handleConnect,
-    handleDisconnect,
     handleLogin,
+    handleDisconnect,
   } = useLogin();
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen p-6">
-      <h1 className="text-2xl font-bold mb-6">Sign In</h1>
-      <ol className="text-left text-sm mb-6 list-decimal list-inside">
-        <li>
-          <ConnectWallet
-            isConnected={isConnected}
-            address={address}
-            onConnect={handleConnect}
-            onDisconnect={handleDisconnect}
-          />
-        </li>
-        <li className="mt-2">
-          <SignMessage isLoggedIn={isLoggedIn} onSign={handleLogin} isLoading={isLoading} />
-        </li>
-      </ol>
+    <Container
+      maxWidth="sm"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+        pt: 4,
+        pb: 4,
+        height: '100vh',
+        justifyContent: 'center',
+      }}
+    >
+      <Typography variant="h4" align="center">
+        Sign In
+      </Typography>
 
-      <LoginStatus isLoggedIn={isLoggedIn} address={address} error={error} />
-    </div>
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Box display="flex" alignItems="center" gap={1}>
+          <AccountBalanceWalletIcon color={isConnected ? 'success' : 'action'} />
+          <Typography variant="body1">
+            {isConnected ? `Connected as ${address}` : 'Connect your wallet'}
+          </Typography>
+        </Box>
+        <ConnectWallet
+          isConnected={isConnected}
+          address={address}
+          onConnect={handleConnect}
+          onDisconnect={handleDisconnect}
+        />
+      </Box>
+
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Typography variant="body1">Sign the login message</Typography>
+        <SignMessage isLoggedIn={isLoggedIn} isLoading={isLoading} onSign={handleLogin} />
+      </Box>
+
+      {isLoading && (
+        <Box display="flex" justifyContent="center">
+          <CircularProgress />
+        </Box>
+      )}
+    </Container>
   );
 }
