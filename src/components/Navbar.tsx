@@ -1,3 +1,4 @@
+// src/components/Navbar.tsx
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
@@ -7,8 +8,14 @@ import { AppBar, Box, Button, IconButton, Toolbar, Typography } from '@mui/mater
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import ThemeSwitcher from './ThemeSwitcher';
 
-export default function Navbar() {
+interface NavbarProps {
+  mode: 'light' | 'dark';
+  toggleTheme: () => void;
+}
+
+export default function Navbar({ mode, toggleTheme }: NavbarProps) {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn, isLoading } = useAuth();
   const [hasMounted, setHasMounted] = useState(false);
@@ -17,32 +24,36 @@ export default function Navbar() {
     setHasMounted(true);
   }, []);
 
+  if (!hasMounted || isLoading) return null;
+
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     setIsLoggedIn(false);
     router.push('/login');
   };
 
-  if (!hasMounted || isLoading) return null;
-
   return (
     <AppBar position="static" color="default" elevation={1}>
-      <Toolbar>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography
           variant="h6"
           component={Link}
           href="/"
-          sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
+          sx={{ textDecoration: 'none', color: 'inherit' }}
         >
           CryptoTracker
         </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
+
+        <Box display="flex" alignItems="center" gap={2}>
+          <ThemeSwitcher mode={mode} toggleTheme={toggleTheme} />
+
           <Button component={Link} href="/" color="inherit">
             Home
           </Button>
           <Button component={Link} href="/dashboard" color="inherit">
             Dashboard
           </Button>
+
           {isLoggedIn ? (
             <IconButton color="error" onClick={handleLogout} title="Logout">
               <LogoutIcon />
