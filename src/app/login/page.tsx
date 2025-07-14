@@ -10,7 +10,6 @@ export default function LoginPage() {
   const {
     address,
     isConnected,
-    error,
     isLoading,
     isLoggedIn,
     handleConnect,
